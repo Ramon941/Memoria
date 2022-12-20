@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="memoria.css">
+</head>
+
+<body>
+    <div id="amarillo">
+        <p id="amarillo2">Aciertos:</p>
+        <p id="contadoramarillo">0</p>
+        <button onclick="copiar()">Copiar array</button>
+        <button onclick = "mostrar()">Mostrar</button>
+    </div>
+</body>
+
+<script>
+
+    //Nombre de los jugadores
+    nombre = prompt("Nombre del jugador 1");
+    var amarillo = document.getElementById("amarillo2");//Coje el nombre del participante
+    amarillo.innerText = "Turnos " + nombre + ":";
+
+    //Contadores de los puntos
+    var ganaamarillo = document.getElementById("contadoramarillo");//Coje el 0 
+
+    //Genera la lista de Pokemon aleatorios
+    const numP = 27; //Número de imagenes de las cuales poder seleccionar
+    let listaPk = [];
+    let repetido;
+    for (let i = 0; i < numP; i++) {
+        while (!listaPk[i]) {
+            repetido = true;
+            while (repetido == true) {
+                let random = Math.random();
+                random = random * numP + 1;
+                random = Math.trunc(random);
+                for (let j = 0; j < listaPk.length; j++) {
+                    if (listaPk[j] == random) {
+                        repetido = true;
+                        break;
+                    } else {
+                        repetido = false;
+                    }
+                }
+                listaPk[i] = random;
+            }
+        }
+    }
+
+    var arrayimagenes = [0, 0, 0, 0, 0, 0, 0, 0, 0];//Array con las imagenes
+
+    for (let i = 0; i < arrayimagenes.length; i++) {//Relleno el array con las imagenes
+        arrayimagenes[i] = listaPk[i];
+        arrayimagenes[i] = arrayimagenes[i] + ".png";
+    }
+
+    var arrayconta = [0, 0, 0, 0, 0, 0, 0, 0, 0];//Array que controlará el nº veces de una imagen
+
+    //Crear el tablero
+    var cuadros;
+    var tabla = document.createElement("table");
+    for (var f = 0; f < 3; f++) {
+        var fila = document.createElement("tr");//Crea las filas
+        for (var c = 0; c < 6; c++) {
+            var columna = document.createElement("td"); //Crea las columnas
+            var img2 = document.createElement("img");
+            img2.setAttribute("class", "pokemon");
+            var entrar = false;
+
+            do {
+                numero = Math.floor(Math.random() * arrayimagenes.length);//Genera los números aleatorios
+                if (arrayconta[numero] != 2) {
+                    img2.src = "img/" + arrayimagenes[numero];
+                    arrayconta[numero]++;
+                    entrar = true;
+                }
+            } while (!entrar);
+
+            cuadros = document.createElement("div");
+            cuadros.setAttribute("class", "cuadrosD")
+            cuadros.appendChild(img2);
+            columna.appendChild(cuadros);
+            fila.appendChild(columna); //añade la columna a la fila
+        }
+        tabla.appendChild(fila); //añade la fila a la tabla
+    }
+    document.body.appendChild(tabla); //añade la tabla al HTML
+    tabla.setAttribute("class", "tabla"); //Le da clase "tabla" a la tabla creada
+
+
+    cuadrosdos = document.getElementsByClassName("cuadrosD");
+    var imagenes = document.getElementsByClassName("pokemon");
+    var copia;
+
+    function copiar(){
+        copia = [].concat(imagenes);
+    }
+
+    function mostrar(){
+        console.log(imagenes);
+        console.log(copia);
+    }
+
+    var contador = 0; //Controla que solo haga dos click
+    var primero;
+    var segundo;
+    var posicion = 0;
+    var posiciondos = 0;
+    var f = 0;
+
+    if (f == 0) {
+        for (let p = 0; p < cuadrosdos.length; p++) {
+            cuadrosdos[p].onclick = function () {
+                if (imagenes[p].style.opacity != 1 && contador < 2) {
+                    imagenes[p].style.opacity = 1;
+                    if (primero == undefined) {
+                        primero = imagenes[p].src;
+                        posicion = p;
+                    } else {
+                        segundo = imagenes[p].src;
+                        posiciondos = p;
+                    }
+                    contador++;//Suma 1 al contador para el control del click
+                    cuadrosdos[p].style.backgroundImage = "url('')";
+                    cuadrosdos[p].style.backgroundColor = "white";
+                }
+            }
+        }
+        ganar();
+    }
+
+    var ganar1;
+    function ganar() {
+        ganar1 = setInterval(comprobar, 2000);
+    }
+
+
+    function comprobar() {
+        if (primero == segundo && segundo != undefined && imagenes[posicion].src != undefined) {
+            primero = undefined;
+            segundo = undefined;
+            imagenes[posicion].src = "img/pokeballgif.gif";
+            imagenes[posicion].style.width = "110px";
+            imagenes[posicion].style.height = "110px";
+            imagenes[posicion].style.marginTop = "30%";
+            imagenes[posicion].style.marginLeft = "10px";
+            imagenes[posiciondos].src = "img/pokeballgif.gif";
+            imagenes[posiciondos].style.width = "110px";
+            imagenes[posiciondos].style.height = "110px";
+            imagenes[posiciondos].style.marginTop = "30%";
+            imagenes[posiciondos].style.marginLeft = "10px";
+            ganaamarillo.innerText++;
+        } else if (primero != undefined && segundo != undefined) {
+            for (let i = 0; i < cuadrosdos.length; i++) {
+                imagenes[i].style.opacity = 0;
+                if (imagenes[i].src == "http://192.168.0.23:5501/Desarrollo%20Web%20en%20entorno%20cliente/ejercicios/Memoria/img/pokeballgif.gif") {
+                    imagenes[i].src = copiaimagenes[i];
+                }
+                cuadrosdos[i].style.backgroundImage = "url('https://tcg.pokemon.com/assets/img/global/tcg-card-back.jpg')";
+                cuadrosdos[i].style.backgroundImage = "url('https://tcg.pokemon.com/assets/img/global/tcg-card-back.jpg')";
+            }
+            primero = undefined;
+            segundo = undefined;
+        }
+        ganaamarillo.innerText++;
+        contador = 0;//Define el contador de click de nuevo a 0 para poder volver a clicar
+    }
+
+</script>
+
+</html>
